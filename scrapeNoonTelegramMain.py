@@ -1,10 +1,20 @@
+import codecs
 import csv
 import time
 import requests
 from bs4 import BeautifulSoup
 import json
 import random
+
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 import lxml
+import html.parser
+from seleniumwire import webdriver
+from selenium.webdriver.common.proxy import Proxy, ProxyType
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 
 TARGET_DISCOUNT = 74
 
@@ -19,7 +29,7 @@ URLS = [
     'https://www.noon.com/uae-en/beauty-and-health/beauty/fragrance/',
     'https://www.noon.com/uae-en/toys-and-games/',
     'https://www.noon.com/uae-en/sports-and-outdoors/'
-    ]
+]
 
 HEADERS = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -34,6 +44,23 @@ verify = 'C:\\Users\\telefonieren\\PycharmProjects\\pythonProjecttemptestproxy39
 
 
 def get_goods_to_csv(URL):
+    options = {
+        'proxy': {
+            'http': 'http://36fed4faf7ab461595311862d452f95c:@proxy.crawlera.com:8011/',
+            'https': 'http://36fed4faf7ab461595311862d452f95c:@proxy.crawlera.com:8011/',
+            'no_proxy': 'localhost,127.0.0.1'  # excludes
+        }
+    }
+    driver = webdriver.Chrome("C:\\Users\\telefonieren\\Downloads\\chromedriver.exe", seleniumwire_options = options)
+    driver.get(URL + f'?limit=50')
+    print('Wait 10sec')
+    time.sleep(10)
+
+    pic = driver.find_element(By.ID, 'productBox-N15441865A')
+    action = ActionChains(driver)
+    action.move_to_element(pic).perform()
+    good_pic = pic.find_element(By.NAME, 'src')
+    print(good_pic)
     req = requests.get(URL + '?limit=100', HEADERS, proxies=proxies, verify=verify)
     src = req.text
 
@@ -41,7 +68,7 @@ def get_goods_to_csv(URL):
     file_string = URL.split('/')[:-1]
     print(file_string[-1])
     page_number = int(soup.find(class_='next').find_previous(class_='pageLink').text)  # Detecting number of pages
-    file_name = file_string[-1]+'.json'  # Initializing the filename for each category
+    file_name = file_string[-1] + '.json'  # Initializing the filename for each category
     result_data = []
     # with open(file_name, 'w', newline='', encoding='utf-8') as csvfile:
     #     goods_writer = csv.writer(csvfile)
@@ -51,14 +78,17 @@ def get_goods_to_csv(URL):
         page_number = 49
     for page in range(1, page_number):
         time.sleep(0.1)
+
         req = requests.get(URL + f'?limit=50&page={page}&sort[by]=popularity&sort[dir]=desc', HEADERS,
                            proxies=proxies, verify=verify)
         src = req.text
+
         soup = BeautifulSoup(src, 'lxml')
         print(
             f'****** Finding goods with {TARGET_DISCOUNT}% and more discount on the page {page} out of {page_number} pages *********')
 
         goods = soup.find_all(class_='discount')
+
 
         for good in goods:
 
@@ -70,6 +100,7 @@ def get_goods_to_csv(URL):
                 good_link = good.find_previous('a', href=True)
 
                 discount_good_name = good.find_previous('div', attrs={'data-qa': 'product-name'})
+
                 print(
                     f'{number_of_goods}. {discount_good_name.text.strip()} --->  {good.text.strip()}  WAS: {old_price} | NOW: {discounted_price}')
                 number_of_goods += 1
@@ -78,23 +109,24 @@ def get_goods_to_csv(URL):
                 #      'noon.com' + good_link['href']])
                 result_data.append(
                     {
-                        'title':discount_good_name.text.strip()[:-2],
-                        'discount':good.text.strip(),
-                        'old_price':old_price,
-                        'new_price':discounted_price,
-                        'link':'noon.com'+good_link['href']
+                        'title': discount_good_name.text.strip()[:-2],
+                        'discount': good.text.strip(),
+                        'old_price': old_price,
+                        'new_price': discounted_price,
+                        'link': 'noon.com' + good_link['href']
                     }
                 )
 
         print(f'So far, found {number_of_goods - 1} discounted products')
-    with open(file_name,'w') as file:
+    with open(file_name, 'w') as file:
         json.dump(result_data, file, indent=4, ensure_ascii=False)
     # csvfile.close()
 
 
 def main():
-    for URL in URLS:
-        get_goods_to_csv(URL)
+    # for URL in URLS:
+    #     get_goods_to_csv(URL)
+    get_goods_to_csv('https://www.noon.com/uae-en/toys-and-games/')
 
 
 if __name__ == '__main__':
