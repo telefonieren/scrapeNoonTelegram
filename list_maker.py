@@ -11,7 +11,7 @@ def collect_all_items(id):
     for file in os.listdir(directory+'/'):
         if file.endswith('.json') and not file.endswith('collection.json'):
             print(os.path.join('', file))
-            with open(file) as ifile:
+            with open(file, encoding='windows-1252') as ifile:
                 print(f'opened {file}')
                 goods = json.load(ifile)
                 for good in goods:
