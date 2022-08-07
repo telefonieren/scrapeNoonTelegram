@@ -42,7 +42,7 @@ verify = 'C:\\Users\\telefonieren\\PycharmProjects\\pythonProjecttemptestproxy39
 
 def get_goods_to_csv(URL):
 
-    req = requests.get('http://whatismyip.org')
+    req = requests.get(URL)
     src = req.text
     print(src)
 
