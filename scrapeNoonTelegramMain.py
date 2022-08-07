@@ -6,15 +6,10 @@ from bs4 import BeautifulSoup
 import json
 import random
 
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
+
 import lxml
 import html.parser
-from seleniumwire import webdriver
-from selenium.webdriver.common.proxy import Proxy, ProxyType
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+
 
 TARGET_DISCOUNT = 74
 
@@ -44,24 +39,8 @@ verify = 'C:\\Users\\telefonieren\\PycharmProjects\\pythonProjecttemptestproxy39
 
 
 def get_goods_to_csv(URL):
-    options = {
-        'proxy': {
-            'http': 'http://36fed4faf7ab461595311862d452f95c:@proxy.crawlera.com:8011/',
-            'https': 'http://36fed4faf7ab461595311862d452f95c:@proxy.crawlera.com:8011/',
-            'no_proxy': 'localhost,127.0.0.1'  # excludes
-        }
-    }
-    driver = webdriver.Chrome("C:\\Users\\telefonieren\\Downloads\\chromedriver.exe", seleniumwire_options = options)
-    driver.get(URL + f'?limit=50')
-    print('Wait 10sec')
-    time.sleep(10)
 
-    pic = driver.find_element(By.ID, 'productBox-N15441865A')
-    action = ActionChains(driver)
-    action.move_to_element(pic).perform()
-    good_pic = pic.find_element(By.NAME, 'src')
-    print(good_pic)
-    req = requests.get(URL + '?limit=100', HEADERS, proxies=proxies, verify=verify)
+    req = requests.get(URL + '?limit=100', HEADERS)
     src = req.text
 
     soup = BeautifulSoup(src, 'lxml')
@@ -70,8 +49,7 @@ def get_goods_to_csv(URL):
     page_number = int(soup.find(class_='next').find_previous(class_='pageLink').text)  # Detecting number of pages
     file_name = file_string[-1] + '.json'  # Initializing the filename for each category
     result_data = []
-    # with open(file_name, 'w', newline='', encoding='utf-8') as csvfile:
-    #     goods_writer = csv.writer(csvfile)
+
 
     number_of_goods = 1
     if page_number > 49:
@@ -79,8 +57,7 @@ def get_goods_to_csv(URL):
     for page in range(1, page_number):
         time.sleep(0.1)
 
-        req = requests.get(URL + f'?limit=50&page={page}&sort[by]=popularity&sort[dir]=desc', HEADERS,
-                           proxies=proxies, verify=verify)
+        req = requests.get(URL + f'?limit=50&page={page}&sort[by]=popularity&sort[dir]=desc', HEADERS)
         src = req.text
 
         soup = BeautifulSoup(src, 'lxml')
@@ -120,13 +97,13 @@ def get_goods_to_csv(URL):
         print(f'So far, found {number_of_goods - 1} discounted products')
     with open(file_name, 'w') as file:
         json.dump(result_data, file, indent=4, ensure_ascii=False)
-    # csvfile.close()
+
 
 
 def main():
-    # for URL in URLS:
-    #     get_goods_to_csv(URL)
-    get_goods_to_csv('https://www.noon.com/uae-en/toys-and-games/')
+    for URL in URLS:
+        get_goods_to_csv(URL)
+
 
 
 if __name__ == '__main__':
