@@ -34,7 +34,7 @@ def create_day_list(id):
     print(ids)
     final_result = []
     for element in ids:
-        with open('collection.json') as file:
+        with open('collection.json', encoding='windows-1252') as file:
             goods = json.load(file)
             for good in goods:
                 cid = good.get('id')
