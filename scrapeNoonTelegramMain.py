@@ -5,6 +5,8 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import random
+import os
+import urllib
 
 
 import lxml
@@ -40,9 +42,12 @@ verify = 'C:\\Users\\telefonieren\\PycharmProjects\\pythonProjecttemptestproxy39
 
 def get_goods_to_csv(URL):
 
-    req = requests.get(URL + '?limit=100', HEADERS)
+    req = requests.get('http://whatismyip.org')
     src = req.text
     print(src)
+
+
+
     soup = BeautifulSoup(src, 'lxml')
     file_string = URL.split('/')[:-1]
     print(file_string[-1])
