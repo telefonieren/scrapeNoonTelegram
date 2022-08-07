@@ -8,7 +8,7 @@ def collect_all_items(id):
     init_collection = []
     directory = os.getcwd()
     print(directory)
-    for file in os.listdir(directory+'\\'):
+    for file in os.listdir(directory+'/'):
         if file.endswith('.json') and not file.endswith('collection.json'):
             print(os.path.join('', file))
             with open(file) as ifile:
