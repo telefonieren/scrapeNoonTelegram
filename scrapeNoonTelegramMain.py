@@ -42,7 +42,7 @@ def get_goods_to_csv(URL):
 
     req = requests.get(URL + '?limit=100', HEADERS)
     src = req.text
-
+    print(src)
     soup = BeautifulSoup(src, 'lxml')
     file_string = URL.split('/')[:-1]
     print(file_string[-1])
