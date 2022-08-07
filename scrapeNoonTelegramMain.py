@@ -106,8 +106,12 @@ def get_goods_to_csv(URL):
 
 
 def main():
+    time.sleep(180)
     for URL in URLS:
         get_goods_to_csv(URL)
+    with open('log.txt', 'w') as file:
+        file.write('done')
+    file.close()
 
 
 
