@@ -33,11 +33,7 @@ HEADERS = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'
 }
 
-proxies = {
-    "http": "http://36fed4faf7ab461595311862d452f95c:@proxy.crawlera.com:8011/",
-    "https": "http://36fed4faf7ab461595311862d452f95c:@proxy.crawlera.com:8011/",
-}
-verify = 'C:\\Users\\telefonieren\\PycharmProjects\\pythonProjecttemptestproxy39\\zyte-smartproxy-ca.crt'
+
 
 
 def get_goods_to_csv(URL):
