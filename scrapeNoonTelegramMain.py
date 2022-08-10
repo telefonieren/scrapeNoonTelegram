@@ -28,7 +28,6 @@ def get_goods_to_json(URL):
     req = requests.get(URL)
     src = req.text
 
-
     soup = BeautifulSoup(src, 'lxml')
     file_string = URL.split('/')[:-1]
     print(file_string[-1])
@@ -84,9 +83,9 @@ def get_goods_to_json(URL):
 
 
 def main():
-    # for URL in URLS:
-    #     get_goods_to_json(URL)
-    get_goods_to_json('https://www.noon.com/uae-en/toys-and-games/')
+    for URL in URLS:
+        get_goods_to_json(URL)
+
     with open('log.txt', 'w') as file:
         file.write('done')
     file.close()
