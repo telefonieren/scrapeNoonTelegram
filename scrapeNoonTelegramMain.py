@@ -27,7 +27,7 @@ HEADERS = {
 def get_goods_to_json(URL):
     req = requests.get(URL)
     src = req.text
-    print(src)
+
 
     soup = BeautifulSoup(src, 'lxml')
     file_string = URL.split('/')[:-1]
