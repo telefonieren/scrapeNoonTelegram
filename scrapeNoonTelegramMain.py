@@ -2,6 +2,10 @@ import time
 import requests
 from bs4 import BeautifulSoup
 import json
+import lxml
+from selenium import webdriver
+import phantomjs
+
 
 TARGET_DISCOUNT = 74
 
@@ -39,48 +43,49 @@ def get_goods_to_json(URL):
     if page_number > 49:
         page_number = 49
     for page in range(1, page_number):
-        try:
-            time.sleep(0.1)
 
-            req = requests.get(URL + f'?limit=50&page={page}&sort[by]=popularity&sort[dir]=desc', HEADERS)
-            src = req.text
+        time.sleep(0.1)
+        browser = webdriver.Chrome()
+        browser.get(f'{URL}?limit=50&page={page}')
+        html = browser.page_source
+        # req = requests.get(f'{URL}?limit=50&page={page}', HEADERS, timeout=10)
+        # src = req.text
+        print(URL + f'?limit=50&page={page}')
+        soup = BeautifulSoup(html, 'lxml')
+        print(
+            f'****** Finding goods with {TARGET_DISCOUNT}% and more discount on the page {page} out of {page_number} '
+            f'pages *********')
 
-            soup = BeautifulSoup(src, 'lxml')
-            print(
-                f'****** Finding goods with {TARGET_DISCOUNT}% and more discount on the page {page} out of {page_number} '
-                f'pages *********')
+        goods = soup.find_all(class_='discount')
 
-            goods = soup.find_all(class_='discount')
+        for good in goods:
 
-            for good in goods:
+            good_discount = good.text.replace('%', '').replace(' ', '').replace('Off', '').strip()
 
-                good_discount = good.text.replace('%', '').replace(' ', '').replace('Off', '').strip()
+            if int(good_discount) > TARGET_DISCOUNT:
+                old_price = good.find_previous(class_='oldPrice').text.strip()
+                discounted_price = 'AED ' + good.find_previous(class_='currency').find_next('strong').text
+                good_link = good.find_previous('a', href=True)
 
-                if int(good_discount) > TARGET_DISCOUNT:
-                    old_price = good.find_previous(class_='oldPrice').text.strip()
-                    discounted_price = 'AED ' + good.find_previous(class_='currency').find_next('strong').text
-                    good_link = good.find_previous('a', href=True)
+                discount_good_name = good.find_previous('div', attrs={'data-qa': 'product-name'})
 
-                    discount_good_name = good.find_previous('div', attrs={'data-qa': 'product-name'})
+                print(
+                    f'{number_of_goods}. {discount_good_name.text.strip()} --->  {good.text.strip()}  WAS: {old_price} '
+                    f'| NOW: {discounted_price}')
+                number_of_goods += 1
 
-                    print(
-                        f'{number_of_goods}. {discount_good_name.text.strip()} --->  {good.text.strip()}  WAS: {old_price} '
-                        f'| NOW: {discounted_price}')
-                    number_of_goods += 1
+                result_data.append(
+                    {
+                        'title': discount_good_name.text.strip()[:-2],
+                        'discount': good.text.strip(),
+                        'old_price': old_price,
+                        'new_price': discounted_price,
+                        'link': 'noon.com' + good_link['href']
+                    }
+                )
 
-                    result_data.append(
-                        {
-                            'title': discount_good_name.text.strip()[:-2],
-                            'discount': good.text.strip(),
-                            'old_price': old_price,
-                            'new_price': discounted_price,
-                            'link': 'noon.com' + good_link['href']
-                        }
-                    )
+        print(f'So far, found {number_of_goods - 1} discounted products')
 
-            print(f'So far, found {number_of_goods - 1} discounted products')
-        except:
-            print("failed to open page")
     with open(file_name, 'w', encoding='utf-8') as file:
         json.dump(result_data, file, indent=4, ensure_ascii=False)
 
