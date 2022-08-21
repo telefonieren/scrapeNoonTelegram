@@ -96,7 +96,7 @@ def collect_data(page, product_url):
         try:
             for name in product_names:
                 if name['sale_price']:
-                    if int(name['sale_price'])/int(name['price']) < 0.25:
+                    if int(name['sale_price'])/int(name['price']) < 0.25 and name['is_buyable']:
                         print(f'{name["brand"]} {name["name"]} https://www.noon.com/uae-en/{name["url"]}/{name["sku"]}/p/?o={name["offer_code"]}')
                         fashion_list.append(
                             {
