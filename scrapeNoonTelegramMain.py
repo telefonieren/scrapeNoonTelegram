@@ -97,6 +97,9 @@ def collect_data(page, product_url):
             except(requests.exceptions.SSLError):
                 print('Next')
                 continue
+            except(requests.exceptions.ProxyError):
+                print('ProxyError')
+                continue
             r = 0
 
         product_names = response.get('hits')
