@@ -81,7 +81,7 @@ def collect_data(page, product_url):
         }
         print(f'Processing page {i}/{page}')
         free_proxy = FreeProxy(country_id='US', timeout=1000).get()
-        print(free_proxy)
+        print(f'1st {free_proxy}')
         response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout=160,
                                 params=params, cookies=cookies, headers=headers, proxies=free_proxy).json()
 
