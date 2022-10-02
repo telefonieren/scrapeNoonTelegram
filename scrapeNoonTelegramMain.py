@@ -81,16 +81,23 @@ def collect_data(page, product_url):
             'page': f'{i}',
         }
         print(f'Processing page {i}/{page}')
-        try:
-            free_proxy = FreeProxy(country_id='US').get()
-        except:
-            print('Failed but will be sooo good again')
-        FPROXY = {
-            'http': free_proxy,
-            'https': free_proxy
-        }
-        response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout=160,
-                                params=params, cookies=cookies, headers=headers, proxies=FPROXY).json()
+        r = True
+        while r:
+            try:
+                free_proxy = FreeProxy(country_id='US', rand=True).get()
+            except:
+                print('Failed but will be sooo good again')
+            FPROXY = {
+                'http': free_proxy,
+                'https': free_proxy
+            }
+            try:
+                response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout=160,
+                                    params=params, cookies=cookies, headers=headers, proxies=FPROXY).json()
+            except(requests.exceptions.SSLError):
+                print('Next')
+                continue
+            r = 0
 
         product_names = response.get('hits')
         try:
@@ -119,16 +126,23 @@ def collect_data(page, product_url):
 
 
 def get_goods_to_json(URL):
-    try:
-        free_proxy = FreeProxy(country_id='US').get()
-    except:
-        print('Failed but will try again')
-    FPROXY = {
-        'http': free_proxy,
-        'https': free_proxy
-    }
-    print(free_proxy)
-    req = requests.get(URL, timeout=160, cookies=cookies, headers=headers, proxies=FPROXY)
+    r = True
+    while r:
+        try:
+            free_proxy = FreeProxy(country_id='US',rand=True).get()
+        except:
+            print('Failed but will try again')
+        FPROXY = {
+            'http': free_proxy,
+            'https': free_proxy
+        }
+        print(free_proxy)
+        try:
+            req = requests.get(URL, timeout=160, cookies=cookies, headers=headers, proxies=FPROXY)
+        except(requests.exceptions.SSLError):
+            print('All failed with SSL')
+            continue
+        r = 0
     src = req.text
 
     soup = BeautifulSoup(src, 'lxml')
