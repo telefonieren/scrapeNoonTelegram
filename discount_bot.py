@@ -72,7 +72,7 @@ async def main():
 
             await bot.send_message(-1001712092516, card, parse_mode=types.ParseMode.HTML)
             print(card)
-            time.sleep(1400)
+            time.sleep(2800)
     file.close()
 
 

@@ -27,7 +27,7 @@ def collect_all_items(id):
 
 
 def create_day_list(id):
-    ids = random.sample(range(1, id), 36)
+    ids = random.sample(range(1, id), 18)
     print(ids)
     final_result = []
     for element in ids:
