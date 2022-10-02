@@ -3,21 +3,22 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import lxml
-
-
+from fp.fp import FreeProxy
 
 TARGET_DISCOUNT = 74
 
+PROXY = {
+    'http': 'http://147.75.88.45:10001',
+    'https': 'http://147.75.88.45:10001',
+}
+
 URLS = [
-    'https://www.noon.com/uae-en/fashion/fashion-men/',
-    'https://www.noon.com/uae-en/fashion/fashion-women/',
-    'https://www.noon.com/uae-en/home-and-kitchen/',
-    'https://www.noon.com/uae-en/electronics-and-mobiles/',
     'https://www.noon.com/uae-en/beauty-and-health/',
     'https://www.noon.com/uae-en/beauty-and-health/beauty/fragrance/',
     'https://www.noon.com/uae-en/toys-and-games/',
     'https://www.noon.com/uae-en/sports-and-outdoors/'
 ]
+
 
 # HEADERS = {
 #     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,'
@@ -27,21 +28,12 @@ URLS = [
 # }
 
 
-
-
-
-
-
-
-
-
-
 def collect_data(page, product_url):
     fashion_list = []
     number_of_goods = 1
     print(f'Processing {product_url}')
-    print(f'Writing to ** {product_url.replace("/","-")[28:-1]}.json ** file')
-    for i in range(1, page+1):
+    print(f'Writing to ** {product_url.replace("/", "-")[28:-1]}.json ** file')
+    for i in range(1, page + 1):
         cookies = {
             'visitor_id': '341f438b-7cfc-4a4f-87aa-e9d0ddd1d364',
             'x-available-ae': 'ecom-daily',
@@ -88,36 +80,41 @@ def collect_data(page, product_url):
             'page': f'{i}',
         }
         print(f'Processing page {i}/{page}')
-
-
-        response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout = 60, params=params, cookies=cookies, headers=headers).json()
+        free_proxy = FreeProxy(country_id='US', timeout=1000).get()
+        print(free_proxy)
+        response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout=160,
+                                params=params, cookies=cookies, headers=headers, proxies=free_proxy).json()
 
         product_names = response.get('hits')
         try:
             for name in product_names:
                 if name['sale_price']:
-                    if int(name['sale_price'])/int(name['price']) < 0.25 and name['is_buyable']:
-                        print(f'{name["brand"]} {name["name"]} https://www.noon.com/uae-en/{name["url"]}/{name["sku"]}/p/?o={name["offer_code"]}')
+                    if int(name['sale_price']) / int(name['price']) < 0.25 and name['is_buyable']:
+                        print(
+                            f'{name["brand"]} {name["name"]} https://www.noon.com/uae-en/{name["url"]}/{name["sku"]}/p/?o={name["offer_code"]}')
                         fashion_list.append(
                             {
-                                'title' : name["brand"] + ' ' + name["name"],
-                                'link'  : f'https://www.noon.com/uae-en/{name["url"]}/{name["sku"]}/p/?o={name["offer_code"]}',
+                                'title': name["brand"] + ' ' + name["name"],
+                                'link': f'https://www.noon.com/uae-en/{name["url"]}/{name["sku"]}/p/?o={name["offer_code"]}',
                                 'old_price': f'{name["price"]} AED',
                                 'new_price': f'{name["sale_price"]} AED',
-                                'discount': str(round((1-int(name['sale_price'])/int(name['price']))*100))+'% Off'
-                             }
+                                'discount': str(
+                                    round((1 - int(name['sale_price']) / int(name['price'])) * 100)) + '% Off'
+                            }
 
                         )
                         number_of_goods = number_of_goods + 1
             print(f'So far found {number_of_goods} products')
         except:
             print('Fuck we lost it')
-    with open(f'{product_url.replace("/","-")[28:-1]}.json', 'w', encoding='utf-8') as file:
+    with open(f'{product_url.replace("/", "-")[28:-1]}.json', 'w', encoding='utf-8') as file:
         json.dump(fashion_list, file, indent=4, ensure_ascii=False)
 
 
 def get_goods_to_json(URL):
-    req = requests.get(URL)
+    free_proxy = FreeProxy(country_id='US', timeout=1000).get()
+    print(free_proxy)
+    req = requests.get(URL, proxies=free_proxy)
     src = req.text
 
     soup = BeautifulSoup(src, 'lxml')
@@ -126,8 +123,6 @@ def get_goods_to_json(URL):
     page_number = int(soup.find(class_='next').find_previous(class_='pageLink').text)  # Detecting number of pages
     file_name = file_string[-1] + '.json'  # Initializing the filename for each category
     result_data = []
-
-
 
     number_of_goods = 1
     if page_number > 49:
@@ -141,7 +136,7 @@ def get_goods_to_json(URL):
         # browser.get(f'{URL}?limit=50&page={page}')
         #
         # html = browser.page_source
-        #req = requests.get(f'{URL}?limit=50&page={page}', HEADERS)
+        # req = requests.get(f'{URL}?limit=50&page={page}', HEADERS)
 
         src = req.text
         print(URL + f'?limit=50&page={page}')
@@ -185,11 +180,8 @@ def get_goods_to_json(URL):
 
 
 def main():
-
     for URL in URLS:
         collect_data(get_goods_to_json(URL), URL)
-
-
 
     # for URL in URLS:
     #     get_goods_to_json(URL)
