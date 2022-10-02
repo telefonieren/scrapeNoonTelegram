@@ -13,6 +13,10 @@ PROXY = {
 }
 
 URLS = [
+    'https://www.noon.com/uae-en/fashion/fashion-men/',
+    'https://www.noon.com/uae-en/fashion/fashion-women/',
+    'https://www.noon.com/uae-en/home-and-kitchen/',
+    'https://www.noon.com/uae-en/electronics-and-mobiles/',
     'https://www.noon.com/uae-en/beauty-and-health/',
     'https://www.noon.com/uae-en/beauty-and-health/beauty/fragrance/',
     'https://www.noon.com/uae-en/toys-and-games/',
@@ -94,10 +98,7 @@ def collect_data(page, product_url):
             try:
                 response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout=160,
                                     params=params, cookies=cookies, headers=headers, proxies=FPROXY).json()
-            except(requests.exceptions.SSLError):
-                print('Next')
-                continue
-            except(requests.exceptions.ProxyError):
+            except:
                 print('ProxyError')
                 continue
             r = 0
@@ -156,8 +157,8 @@ def get_goods_to_json(URL):
     result_data = []
 
     number_of_goods = 1
-    if page_number > 49:
-        page_number = 49
+    if page_number > 19:
+        page_number = 19
 
     return page_number
     for page in range(1, page_number):
