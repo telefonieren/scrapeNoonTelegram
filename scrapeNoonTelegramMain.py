@@ -81,7 +81,10 @@ def collect_data(page, product_url):
             'page': f'{i}',
         }
         print(f'Processing page {i}/{page}')
-        free_proxy = FreeProxy(country_id='US').get()
+        try:
+            free_proxy = FreeProxy(country_id='US').get()
+        except:
+            print('Failed but will be sooo good again')
         FPROXY = {
             'http': free_proxy,
             'https': free_proxy
@@ -116,7 +119,10 @@ def collect_data(page, product_url):
 
 
 def get_goods_to_json(URL):
-    free_proxy = FreeProxy(country_id='US').get()
+    try:
+        free_proxy = FreeProxy(country_id='US').get()
+    except:
+        print('Failed but will try again')
     FPROXY = {
         'http': free_proxy,
         'https': free_proxy
