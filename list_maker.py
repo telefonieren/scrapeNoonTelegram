@@ -21,6 +21,9 @@ def collect_all_items(id):
                     # time.sleep(0.1)
                     init_collection.append(good)
             ifile.close()
+    with open('collection.json', 'w') as jfile:
+        json.dump(init_collection, jfile, indent=4, ensure_ascii=False)
+    jfile.close()
     return id
 
 
