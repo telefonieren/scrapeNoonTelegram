@@ -14,7 +14,14 @@ PROXY = {
 
 URLS = [
     'https://www.noon.com/uae-en/fashion/fashion-men/',
-    'https://www.noon.com/uae-en/fashion/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/women-31229/clothing-16021/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/women-31229/shoes-16238/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/women-31229/accessories-16273/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/women-31229/womens-jewellery/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/women-31229/womens-watches/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/women-31229/handbags-16699/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/luggage-and-bags/wallets-and-card-cases/fashion-women/',
+    'https://www.noon.com/uae-en/fashion/luggage-and-bags/backpacks-22161/fashion-women/',
     'https://www.noon.com/uae-en/home-and-kitchen/',
     'https://www.noon.com/uae-en/electronics-and-mobiles/',
     'https://www.noon.com/uae-en/beauty-and-health/',
@@ -86,22 +93,9 @@ def collect_data(page, product_url):
         }
         print(f'Processing page {i}/{page}')
         r = True
-        while r:
-            try:
-                free_proxy = FreeProxy(country_id='US', rand=True).get()
-            except:
-                print('Failed but will be sooo good again')
-            FPROXY = {
-                'http': free_proxy,
-                'https': free_proxy
-            }
-            try:
-                response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout=160,
-                                    params=params, cookies=cookies, headers=headers, proxies=FPROXY).json()
-            except:
-                print('ProxyError')
-                continue
-            r = 0
+        response = requests.get(f'https://www.noon.com/_svc/catalog/api/v3/u{product_url[27:]}', timeout=160,
+                                    params=params, cookies=cookies, headers=headers).json()
+
 
         product_names = response.get('hits')
         try:
@@ -131,34 +125,22 @@ def collect_data(page, product_url):
 
 def get_goods_to_json(URL):
     r = True
-    while r:
-        try:
-            free_proxy = FreeProxy(country_id='US',rand=True).get()
-        except:
-            print('Failed but will try again')
-        FPROXY = {
-            'http': free_proxy,
-            'https': free_proxy
-        }
-        print(free_proxy)
-        try:
-            req = requests.get(URL, timeout=160, cookies=cookies, headers=headers, proxies=FPROXY)
-        except(requests.exceptions.SSLError):
-            print('All failed with SSL')
-            continue
-        r = 0
-    src = req.text
+    req = requests.get(URL, timeout=160, cookies=cookies, headers=headers)
 
+    src = req.text
     soup = BeautifulSoup(src, 'lxml')
     file_string = URL.split('/')[:-1]
+
+
+
     print(file_string[-1])
     page_number = int(soup.find(class_='next').find_previous(class_='pageLink').text)  # Detecting number of pages
     file_name = file_string[-1] + '.json'  # Initializing the filename for each category
     result_data = []
 
     number_of_goods = 1
-    if page_number > 19:
-        page_number = 19
+    if page_number > 29:
+        page_number = 29
 
     return page_number
     for page in range(1, page_number):
