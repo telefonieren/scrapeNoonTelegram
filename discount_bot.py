@@ -1,3 +1,4 @@
+import random
 import time
 import json
 
@@ -63,11 +64,14 @@ async def main():
 
     with open('final_result.json') as file:
         data = json.load(file)
+        smile_1 = random.choice(['😍', '🤩', '🤑', '😻', '🤪','🤠','🤫','🥳'])
+        smile_2 = random.choice(['⭐', '🌟', '💥', '🔥', '💐', '🌈', '🌞', '🍾', '🏆', '🏅'])
+
         for item in data:
             card = f"{hlink(item.get('title'), item.get('link'))}\n" \
-                   f"{hbold('Цена: ')} {hbold(item.get('new_price'))} 🔥\n" \
+                   f"{hbold('Цена: ')} {hbold(item.get('new_price'))} {smile_1}\n" \
                    f"Старая цена: {item.get('old_price')}\n" \
-                   f"{hbold('Общая скидка: ')}{hitalic(item.get('discount'))} 😍\n" \
+                   f"{hbold('Общая скидка: ')}{hitalic(item.get('discount'))} {smile_2}\n" \
 
 
             await bot.send_message(-1001712092516, card, parse_mode=types.ParseMode.HTML)
