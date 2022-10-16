@@ -64,10 +64,11 @@ async def main():
 
     with open('final_result.json') as file:
         data = json.load(file)
-        smile_1 = random.choice(['😍', '🤩', '🤑', '😻', '🤪','🤠','🤫','🥳'])
-        smile_2 = random.choice(['⭐', '🌟', '💥', '🔥', '💐', '🌈', '🌞', '🍾', '🏆', '🏅'])
+
 
         for item in data:
+            smile_1 = random.choice(['😍', '🤩', '🤑', '😻', '🤪', '🤠', '🤫', '🥳'])
+            smile_2 = random.choice(['⭐', '🌟', '💥', '🔥', '💐', '🌈', '🌞', '🍾', '🏆', '🏅'])
             card = f"{hlink(item.get('title'), item.get('link'))}\n" \
                    f"{hbold('Цена: ')} {hbold(item.get('new_price'))} {smile_1}\n" \
                    f"Старая цена: {item.get('old_price')}\n" \
