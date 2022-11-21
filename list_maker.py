@@ -21,13 +21,16 @@ def collect_all_items(id):
                     # time.sleep(0.1)
                     init_collection.append(good)
             ifile.close()
+    with open('collection.json', 'w') as jfile:
+        json.dump(init_collection, jfile, indent=4, ensure_ascii=False)
+    jfile.close()
     return id
 
 
 
 
 def create_day_list(id):
-    ids = random.sample(range(1, id), 36)
+    ids = random.sample(range(1, id), 18)
     print(ids)
     final_result = []
     for element in ids:
