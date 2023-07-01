@@ -32,6 +32,8 @@ def collect_all_items(id):
 def create_day_list(id):
     ids = random.sample(range(1, id), 18)
     print(ids)
+    smile = random.choice(['😍','🤩','🤑','😻','🤪'])
+    print(f'kuku {smile}')
     final_result = []
     for element in ids:
         with open('collection.json', encoding='windows-1252') as file:
